@@ -8,7 +8,7 @@ st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
 st.markdown("Welcome. Share a thought, a story, or a simple observation, and let's explore it together.")
 
-# --- 2. Secure API Key Handling ---
+# --- 2. Secure API Key Handling & Sidebar ---
 # First, try to grab the secret key from Streamlit's vault
 try:
     api_key = st.secrets["GOOGLE_API_KEY"]
@@ -23,6 +23,26 @@ with st.sidebar:
     else:
         api_key = st.text_input("Google Gemini API Key", type="password")
         st.markdown("*(Your key is strictly used for this active session and is not saved.)*")
+
+    # --- NEW: Download Chat Feature ---
+    # Only show the download button if there is an active conversation!
+    if "display_messages" in st.session_state and len(st.session_state.display_messages) > 0:
+        st.markdown("---") # Adds a clean dividing line
+        st.header("💾 Save Your Chat")
+        
+        # Gather all the messages and format them beautifully into a text document
+        chat_transcript = "✨ The Poetic Conversationalist - Transcript ✨\n\n"
+        for msg in st.session_state.display_messages:
+            speaker = "You" if msg["role"] == "user" else "The Conversationalist"
+            chat_transcript += f"{speaker}:\n{msg['content']}\n\n"
+            
+        # The actual Streamlit download button
+        st.download_button(
+            label="📥 Download Text File",
+            data=chat_transcript,
+            file_name="poetic_transcript.txt",
+            mime="text/plain"
+        )
 
 # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
