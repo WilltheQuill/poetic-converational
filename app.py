@@ -113,4 +113,4 @@ if prompt := st.chat_input("Share a thought here..."):
 
     except Exception as e:
         st.error(f"System Error: {e}")
-        st.sidebar.write(st.session_state)
+st.sidebar.write(st.session_state)
