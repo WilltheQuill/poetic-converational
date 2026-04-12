@@ -26,13 +26,13 @@ with st.sidebar:
 
     # --- NEW: Download Chat Feature ---
     # Only show the download button if there is an active conversation!
-    if "messages" in st.session_state and len(st.session_state.messages) > 0:
-        st.markdown("---") # Adds a clean dividing line
+    if "display_messages" in st.session_state and len(st.session_state["display_messages"]) > 0:
+        st.markdown("---") 
         st.header("💾 Save Your Chat")
         
         # Gather all the messages and format them beautifully into a text document
         chat_transcript = "✨ The Poetic Conversationalist - Transcript ✨\n\n"
-        for msg in st.session_state.messages:
+        for msg in st.session_state["display_messages"]:
             speaker = "You" if msg["role"] == "user" else "The Conversationalist"
             chat_transcript += f"{speaker}:\n{msg['content']}\n\n"
             
@@ -113,4 +113,3 @@ if prompt := st.chat_input("Share a thought here..."):
 
     except Exception as e:
         st.error(f"System Error: {e}")
-st.sidebar.write(st.session_state)
