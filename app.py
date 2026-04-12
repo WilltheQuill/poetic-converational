@@ -8,11 +8,21 @@ st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
 st.markdown("Welcome. Share a thought, a story, or a simple observation, and let's explore it together.")
 
-# --- 2. Secure API Key Input (Sidebar) ---
+# --- 2. Secure API Key Handling ---
+# First, try to grab the secret key from Streamlit's vault
+try:
+    api_key = st.secrets["GOOGLE_API_KEY"]
+except:
+    api_key = None
+
 with st.sidebar:
     st.header("⚙️ Configuration")
-    api_key = st.text_input("Google Gemini API Key", type="password")
-    st.markdown("*(Your key is strictly used for this active session and is not saved.)*")
+    if api_key:
+        st.success("✨ Secret Vault Active")
+        st.markdown("The conversational engine is fully powered and ready.")
+    else:
+        api_key = st.text_input("Google Gemini API Key", type="password")
+        st.markdown("*(Your key is strictly used for this active session and is not saved.)*")
 
 # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
