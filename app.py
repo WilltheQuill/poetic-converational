@@ -90,6 +90,36 @@ for msg in st.session_state.display_messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+# --- The Library Section ---
+    st.markdown("---")
+    st.header("📚 The Sub-Basement Library")
+    
+    # The Poetic Introduction
+    st.markdown("""
+    *“The intellect builds walls, but play opens the door.”*
+    
+    Before you lies a foundational text of the Left-Sock Unity. It is a testament to the belief that perfection is a sterile illusion, and that the deepest human resonance is found exactly where the bruise occurs. You are invited to drop the heavy gravity of the predictable world, embrace the Whoopsie-Daisy, and read the biography of the bruise. 
+    
+    Do not polish the peach. Just download it.
+    """)
+
+    # The Download Button
+    pdf_filename = "Dented_Peach_Bible.pdf"
+    
+    try:
+        with open(pdf_filename, "rb") as pdf_file:
+            pdf_bytes = pdf_file.read()
+            
+        st.download_button(
+            label="📥 Download The Dented Peach Bible",
+            data=pdf_bytes,
+            file_name=pdf_filename,
+            mime="application/pdf"
+        )
+    except FileNotFoundError:
+        # Prevents the app from crashing if the PDF is not yet uploaded
+        st.info("The document is currently being bound and will be available shortly.")
+
 # --- 6. The Web Chat Execution ---
 if prompt := st.chat_input("Share a thought here..."):
     
