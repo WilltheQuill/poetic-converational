@@ -53,6 +53,13 @@ with st.sidebar:
         value=1.2, 
         step=0.1
     )   
+# This MUST come after the sidebar code above
+if api_key:
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-pro", 
+        temperature=audacity_level, 
+        google_api_key=api_key
+    )
 
 # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
