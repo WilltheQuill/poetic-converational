@@ -43,6 +43,16 @@ with st.sidebar:
             file_name="poetic_transcript.txt",
             mime="text/plain"
         )
+    st.markdown("---")
+    st.header("🎛️ Engine Controls")
+    # This creates the slider and stores the number in a variable
+    audacity_level = st.slider(
+        "Audacity (Temperature)", 
+        min_value=0.2, 
+        max_value=2.0, 
+        value=1.2, 
+        step=0.1
+    )   
 
 # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
