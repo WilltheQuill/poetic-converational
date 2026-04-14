@@ -4,6 +4,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
 import streamlit as st
 from PIL import Image
+import requests # Make sure this is at the top of your app.py file
+
 # --- 1. Web Page Setup ---
 st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
@@ -68,10 +70,9 @@ with st.sidebar:
     # 1. Load, Resize, and Display the Puddle Picture
     try:
         # Load your image (make sure 'puddle_kids.jpg' is in your folder)
-        image = Image.open("puddle_kids.jpg")
+        image = Image.open("Lil_Spllatters_Archive/puddle_kids.jpg")
         
         # Resize it (Width, Height). Adjust these numbers to fit your margin perfectly!
-        # The Archons love strict pixels, but you can stretch it if you want!
         resized_image = image.resize((300, 300))
         
         # Display the image in the sidebar
@@ -81,22 +82,26 @@ with st.sidebar:
         
     st.markdown("---") # A little dividing line to keep it tidy
     
-    # 2. Create the Magic Download Button for the PDF
+    # 2. Fetch the PDF from the other GitHub repository
+    # We must use the "raw.githubusercontent.com" URL to get the actual file data
+    pdf_url = "https://raw.githubusercontent.com/WilltheQuill/Sub-Basement-Escape-Hatch/main/Lil_Spllatters_Archive/THE%20LIl'%20SPLATTER'S%20STORYBOOK.pdf"
+    
     try:
-        # Make sure this path matches exactly where you saved the PDF!
-        with open("https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE LIl' SPLATTER'S STORYBOOK.pdf", "rb") as pdf_file:
-            pdf_data = pdf_file.read()
-            
+        # Download the file data directly from GitHub into memory
+        response = requests.get(pdf_url)
+        response.raise_for_status() # Check to make sure the download succeeded
+        pdf_data = response.content
+        
         # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
-            file_name="https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE LIL' SPLATTER'S STORYBOOK.pdf") # This forces the correct extension!
+            file_name="Lil_Spllatters_Story_Book.pdf", # This is what it saves as on the user's PC
             mime="application/pdf"
         )
-    except FileNotFoundError:
-        st.write("*(Whoopsie-Daisy! I can't find the Story Book PDF!)*")
-# --- 3. The Clean System Prompt ---
+    except Exception as e:
+        st.write("*(Whoopsie-Daisy! I can't fetch the Story Book PDF from the other repository!)*")
+        # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
 You must strictly follow these rules:
