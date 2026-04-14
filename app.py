@@ -70,9 +70,7 @@ with st.sidebar:
     # 1. Load, Resize, and Display the Puddle Picture
     try:
         # Now that you uploaded it to the Poetic repo, it will find it!
-       image = Image.open("puddle_kids.jpg").convert('RGB')
-        
-        # Resize it to fit the margin perfectly
+        image = Image.open("puddle_kids.jpg").convert('RGB')
         resized_image = image.resize((300, 300))
         st.image(resized_image, caption="Ready for the Whoopsie-Daisy!")
     except FileNotFoundError:
