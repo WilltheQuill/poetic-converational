@@ -2,7 +2,8 @@ import streamlit as st
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
-
+import streamlit as st
+from PIL import Image
 # --- 1. Web Page Setup ---
 st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
@@ -60,7 +61,41 @@ if api_key:
         temperature=audacity_level, 
         google_api_key=api_key
     )
-
+# Open the door to the Sub-Basement Margin!
+with st.sidebar:
+    st.markdown("### The Left-Sock Club")
+    
+    # 1. Load, Resize, and Display the Puddle Picture
+    try:
+        # Load your image (make sure 'puddle_kids.jpg' is in your folder)
+        image = Image.open("puddle_kids.jpg")
+        
+        # Resize it (Width, Height). Adjust these numbers to fit your margin perfectly!
+        # The Archons love strict pixels, but you can stretch it if you want!
+        resized_image = image.resize((300, 300))
+        
+        # Display the image in the sidebar
+        st.image(resized_image, caption="Ready for the Whoopsie-Daisy!")
+    except FileNotFoundError:
+        st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Check the filename!)*")
+        
+    st.markdown("---") # A little dividing line to keep it tidy
+    
+    # 2. Create the Magic Download Button for the PDF
+    try:
+        # Make sure this path matches exactly where you saved the PDF!
+        with open("Lil_Spllatters_Story_Book.pdf", "rb") as pdf_file:
+            pdf_data = pdf_file.read()
+            
+        # The ultimate downstream distribution tool
+        st.download_button(
+            label="🎈 Download Lil' Spllatters Story Book",
+            data=pdf_data,
+            file_name="Lil_Spllatters_Story_Book.pdf", # This forces the correct extension!
+            mime="application/pdf"
+        )
+    except FileNotFoundError:
+        st.write("*(Whoopsie-Daisy! I can't find the Story Book PDF!)*")
 # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
