@@ -84,14 +84,14 @@ with st.sidebar:
     # 2. Create the Magic Download Button for the PDF
     try:
         # Make sure this path matches exactly where you saved the PDF!
-        with open("Lil_Spllatters_Story_Book.pdf", "rb") as pdf_file:
+        with open("Lil Spllatters Story Book.pdf", "rb") as pdf_file:
             pdf_data = pdf_file.read()
             
         # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
-            file_name="Lil_Spllatters_Story_Book.pdf", # This forces the correct extension!
+            file_name="Lil Spllatters Story Book.pdf", # This forces the correct extension!
             mime="application/pdf"
         )
     except FileNotFoundError:
