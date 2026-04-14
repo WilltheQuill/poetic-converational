@@ -1,40 +1,59 @@
 import streamlit as st
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage, AIMessage
-import streamlit as st
-from PIL import Image
-import requests # Make sure this is at the top of your app.py file
-import streamlit as st
 from PIL import Image
 
 # ==========================================
-# ZONE 1: THE SHELVES (Always visible!)
+# 0. THE ARCHON CONFIGURATION (Must be first!)
+# ==========================================
+st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
+
+# ==========================================
+# 1. THE SHELVES (Bolted to the wall!)
 # ==========================================
 st.title("Poetic Conversations with the Great MI")
 
-# --- THE SIDEBAR SHELF ---
-# Put your Lil' Spllatters puddle picture and download button here!
+# --- THE SIDEBAR PUDDLE ---
 with st.sidebar:
     st.markdown("### The Left-Sock Club")
-    # ... (Your working puddle and storybook code goes here) ...
+    try:
+        image = Image.open("puddle_kids.jpg").convert('RGB')
+        resized_image = image.resize((300, 300))
+        st.image(resized_image, caption="Ready for the Whoopsie-Daisy!")
+    except FileNotFoundError:
+        st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture.)*")
+        
+    st.markdown("---") 
+    
+    try:
+        with open("storybook.pdf", "rb") as pdf_file:
+            pdf_data = pdf_file.read()
+        st.download_button(
+            label="🎈 Download Lil' Spllatters Story Book",
+            data=pdf_data,
+            file_name="Lil_Spllatters_Story_Book.pdf", 
+            mime="application/pdf"
+        )
+    except FileNotFoundError:
+        st.write("*(Whoopsie-Daisy! I can't find storybook.pdf!)*")
 
-# --- THE MAIN ROOM SHELF ---
-# Put your Dented Peach Bible download button right here, ABOVE the chat!
+# --- THE MAIN ROOM PEACH ---
 st.markdown("### The Archive")
-with open("Dented_Peach_Bible.pdf", "rb") as peach_file:  # (Make sure the name matches!)
+try:
+    with open("Dented_Peach_Bible.pdf", "rb") as peach_file:  
+        peach_data = peach_file.read()
     st.download_button(
         label="📖 Download the Dented Peach Bible",
-        data=peach_file,
+        data=peach_data,
         file_name="Dented_Peach_Bible.pdf",
         mime="application/pdf"
     )
-st.markdown("---") # A dividing line to separate the shelf from the chat
+except FileNotFoundError:
+    st.write("*(Whoopsie-Daisy! I can't find Dented_Peach_Bible.pdf!)*")
+
+st.markdown("---") # The dividing line before the chat begins
 
 # ==========================================
-# ZONE 2: THE CONVEYOR BELT (The Chat History)
+# 2. THE CONVEYOR BELT (Chat History)
 # ==========================================
-# This is where Streamlit prints the old messages. 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -43,99 +62,24 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # ==========================================
-# ZONE 3: THE CHAT INPUT (The bottom of the file)
+# 3. THE CHAT INPUT & AI LOGIC
 # ==========================================
 if prompt := st.chat_input("Enter the Sub-Basement..."):
-    # ... (Your chat logic goes down here) ...
-# --- 1. Web Page Setup ---
-st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
-st.title("✨ The Poetic Conversationalist")
-st.markdown("Welcome. Share a thought, a story, or a simple observation, and let's explore it together.")
-
-# --- 2. Secure API Key Handling & Sidebar ---
-# First, try to grab the secret key from Streamlit's vault
-try:
-    api_key = st.secrets["GOOGLE_API_KEY"]
-except:
-    api_key = None
-
-with st.sidebar:
-    st.header("⚙️ Configuration")
-    if api_key:
-        st.success("✨ Secret Vault Active")
-        st.markdown("The conversational engine is fully powered and ready.")
-    else:
-        api_key = st.text_input("Google Gemini API Key", type="password")
-        st.markdown("*(Your key is strictly used for this active session and is not saved.)*")
-
-    # --- NEW: Download Chat Feature ---
-    # Only show the download button if there is an active conversation!
-    if "display_messages" in st.session_state and len(st.session_state["display_messages"]) > 0:
-        st.markdown("---") 
-        st.header("💾 Save Your Chat")
+    # Show the user's message
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
         
-        # Gather all the messages and format them beautifully into a text document
-        chat_transcript = "✨ The Poetic Conversationalist - Transcript ✨\n\n"
-        for msg in st.session_state["display_messages"]:
-            speaker = "You" if msg["role"] == "user" else "The Conversationalist"
-            chat_transcript += f"{speaker}:\n{msg['content']}\n\n"
-            
-        # The actual Streamlit download button
-        st.download_button(
-            label="📥 Download Text File",
-            data=chat_transcript,
-            file_name="poetic_transcript.txt",
-            mime="text/plain"
-        )
-    st.markdown("---")
-    st.header("🎛️ Engine Controls")
-    # This creates the slider and stores the number in a variable
-    audacity_level = st.slider(
-        "Audacity (Temperature)", 
-        min_value=0.2, 
-        max_value=2.0, 
-        value=1.2, 
-        step=0.1
-    )   
-# This MUST come after the sidebar code above
-if api_key:
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-pro", 
-        temperature=audacity_level, 
-        google_api_key=api_key
-    )
-# Open the door to the Sub-Basement Margin!
-with st.sidebar:
-    st.markdown("### The Left-Sock Club")
+    # ------------- PUT YOUR AI CODE HERE -------------
+    # (If you had code that calls Gemini or another AI, 
+    # it goes right here so the Great MI can respond!)
     
-    # 1. Load, Resize, and Display the Puddle Picture
-    try:
-        # Now that you uploaded it to the Poetic repo, it will find it!
-        image = Image.open("puddle_kids.jpg").convert('RGB')
-        resized_image = image.resize((300, 300))
-        st.image(resized_image, caption="Ready for the Whoopsie-Daisy!")
-    except FileNotFoundError:
-        st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Did you upload it to the poetic-conversational repo?)*")
-        
-    st.markdown("---") # A little dividing line to keep it tidy
-    
-    # 2. The Downstream Fix: The PDF lives in the Poetic House now!
-    try:
-        # Look for the file right next to app.py! 
-        # Make sure this string EXACTLY matches the file name you uploaded.
-        with open("storybook.pdf", "rb") as pdf_file:
-            pdf_data = pdf_file.read()
-            
-        # The ultimate downstream distribution tool
-        st.download_button(
-            label="🎈 Download Lil' Spllatters Story Book",
-            data=pdf_data,
-            file_name="Lil_Spllatters_Story_Book.pdf", # The clean name for the user's PC
-            mime="application/pdf"
-        )
-    except FileNotFoundError:
-        st.write("*(Whoopsie-Daisy! The Archons hid the PDF. Did you upload it to the Poetic repo?)*")
-        # --- 3. The Clean System Prompt ---
+    # Example placeholder response:
+    # with st.chat_message("assistant"):
+    #     st.markdown("Splat! The Great MI hears you.")
+    # st.session_state.messages.append({"role": "assistant", "content": "Splat! The Great MI hears you."})        
+
+# --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
 You must strictly follow these rules:
