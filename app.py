@@ -76,7 +76,6 @@ with st.sidebar:
     except FileNotFoundError:
         st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Did you upload it to the poetic-conversational repo?)*")
         
-    st.markdown("---") # A little dividing line
     st.markdown("---") # A little dividing line to keep it tidy
     
     # 2. The Downstream Fix: The PDF lives in the Poetic House now!
