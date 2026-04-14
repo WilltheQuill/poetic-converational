@@ -79,25 +79,24 @@ with st.sidebar:
         st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Did you upload it to the poetic-conversational repo?)*")
         
     st.markdown("---") # A little dividing line
+    st.markdown("---") # A little dividing line to keep it tidy
     
-    # 2. Fetch the PDF from the Sub-Basement using the exact Raw URL
-    pdf_url = "https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE%20LIL'%20SPLATTER'S%20STORYBOOK.pdf"
-    
+    # 2. The Downstream Fix: The PDF lives in the Poetic House now!
     try:
-        # Download the file data directly from the Sub-Basement
-        response = requests.get(pdf_url)
-        response.raise_for_status() 
-        pdf_data = response.content
-        
+        # Look for the file right next to app.py! 
+        # Make sure this string EXACTLY matches the file name you uploaded.
+        with open("THE LIl' SPLATTER'S STORYBOOK.pdf", "rb") as pdf_file:
+            pdf_data = pdf_file.read()
+            
         # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
-            file_name="Lil_Spllatters_Story_Book.pdf", 
+            file_name="Lil_Spllatters_Story_Book.pdf", # The clean name for the user's PC
             mime="application/pdf"
         )
-    except Exception as e:
-        st.write("*(Whoopsie-Daisy! I can't fetch the Story Book PDF from the Sub-Basement!)*")
+    except FileNotFoundError:
+        st.write("*(Whoopsie-Daisy! The Archons hid the PDF. Did you upload it to the Poetic repo?)*")
         # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
