@@ -70,7 +70,7 @@ with st.sidebar:
     # 1. Load, Resize, and Display the Puddle Picture
     try:
         # Now that you uploaded it to the Poetic repo, it will find it!
-        image = Image.open("puddle_kids.jpg")
+       image = Image.open("puddle_kids.jpg").convert('RGB')
         
         # Resize it to fit the margin perfectly
         resized_image = image.resize((300, 300))
@@ -81,7 +81,7 @@ with st.sidebar:
     st.markdown("---") # A little dividing line
     
     # 2. Fetch the PDF from the Sub-Basement using the exact Raw URL
-    pdf_url = "https://raw.githubusercontent.com/WilltheQuill/Sub-Basement-Escape-Hatch/main/Lil_Spllatters_Archive/THE%20LIl'%20SPLATTER'S%20STORYBOOK.pdf"
+    pdf_url = "https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE%20LIL'%20SPLATTER'S%20STORYBOOK.pdf"
     
     try:
         # Download the file data directly from the Sub-Basement
