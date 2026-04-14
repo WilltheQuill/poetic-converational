@@ -82,7 +82,7 @@ with st.sidebar:
     try:
         # Look for the file right next to app.py! 
         # Make sure this string EXACTLY matches the file name you uploaded.
-        with open("THE LIl' SPLATTER'S STORYBOOK.pdf", "rb") as pdf_file:
+        with open("storybook.pdf", "rb") as pdf_file
             pdf_data = pdf_file.read()
             
         # The ultimate downstream distribution tool
