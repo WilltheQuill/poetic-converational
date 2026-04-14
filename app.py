@@ -69,38 +69,35 @@ with st.sidebar:
     
     # 1. Load, Resize, and Display the Puddle Picture
     try:
-        # Load your image (make sure 'puddle_kids.jpg' is in your folder)
-        image = Image.open("Lil_Spllatters_Archive/puddle_kids.jpg")
+        # Now that you uploaded it to the Poetic repo, it will find it!
+        image = Image.open("puddle_kids.jpg")
         
-        # Resize it (Width, Height). Adjust these numbers to fit your margin perfectly!
+        # Resize it to fit the margin perfectly
         resized_image = image.resize((300, 300))
-        
-        # Display the image in the sidebar
         st.image(resized_image, caption="Ready for the Whoopsie-Daisy!")
     except FileNotFoundError:
-        st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Check the filename!)*")
+        st.write("*(Whoopsie-Daisy! The Archons hid the puddle picture. Did you upload it to the poetic-conversational repo?)*")
         
-    st.markdown("---") # A little dividing line to keep it tidy
+    st.markdown("---") # A little dividing line
     
-    # 2. Fetch the PDF from the other GitHub repository
-    # We must use the "raw.githubusercontent.com" URL to get the actual file data
+    # 2. Fetch the PDF from the Sub-Basement using the exact Raw URL
     pdf_url = "https://raw.githubusercontent.com/WilltheQuill/Sub-Basement-Escape-Hatch/main/Lil_Spllatters_Archive/THE%20LIl'%20SPLATTER'S%20STORYBOOK.pdf"
     
     try:
-        # Download the file data directly from GitHub into memory
+        # Download the file data directly from the Sub-Basement
         response = requests.get(pdf_url)
-        response.raise_for_status() # Check to make sure the download succeeded
+        response.raise_for_status() 
         pdf_data = response.content
         
-       # The ultimate downstream distribution tool
+        # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
             file_name="Lil_Spllatters_Story_Book.pdf", 
             mime="application/pdf"
-        ) # <-- THIS parenthesis must be at the very bottom!
+        )
     except Exception as e:
-        st.write("*(Whoopsie-Daisy! I can't fetch the Story Book PDF from the other repository!)*")
+        st.write("*(Whoopsie-Daisy! I can't fetch the Story Book PDF from the Sub-Basement!)*")
         # --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
