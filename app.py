@@ -84,14 +84,14 @@ with st.sidebar:
     # 2. Create the Magic Download Button for the PDF
     try:
         # Make sure this path matches exactly where you saved the PDF!
-        with open("Lil Spllatters Story Book.pdf", "rb") as pdf_file:
+        with open("https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE LIl' SPLATTER'S STORYBOOK.pdf", "rb") as pdf_file:
             pdf_data = pdf_file.read()
             
         # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
-            file_name="Lil Spllatters Story Book.pdf", # This forces the correct extension!
+            file_name="https://github.com/WilltheQuill/Sub-Basement-Escape-Hatch/blob/main/Lil_Spllatters_Archive/THE LIL' SPLATTER'S STORYBOOK.pdf") # This forces the correct extension!
             mime="application/pdf"
         )
     except FileNotFoundError:
