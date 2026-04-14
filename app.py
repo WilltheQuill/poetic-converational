@@ -92,13 +92,13 @@ with st.sidebar:
         response.raise_for_status() # Check to make sure the download succeeded
         pdf_data = response.content
         
-        # The ultimate downstream distribution tool
+       # The ultimate downstream distribution tool
         st.download_button(
             label="🎈 Download Lil' Spllatters Story Book",
             data=pdf_data,
-            file_name="Lil_Spllatters_Story_Book.pdf", # This is what it saves as on the user's PC
+            file_name="Lil_Spllatters_Story_Book.pdf", 
             mime="application/pdf"
-        )
+        ) # <-- THIS parenthesis must be at the very bottom!
     except Exception as e:
         st.write("*(Whoopsie-Daisy! I can't fetch the Story Book PDF from the other repository!)*")
         # --- 3. The Clean System Prompt ---
