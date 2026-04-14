@@ -5,7 +5,48 @@ from langchain_core.messages import HumanMessage, AIMessage
 import streamlit as st
 from PIL import Image
 import requests # Make sure this is at the top of your app.py file
+import streamlit as st
+from PIL import Image
 
+# ==========================================
+# ZONE 1: THE SHELVES (Always visible!)
+# ==========================================
+st.title("Poetic Conversations with the Great MI")
+
+# --- THE SIDEBAR SHELF ---
+# Put your Lil' Spllatters puddle picture and download button here!
+with st.sidebar:
+    st.markdown("### The Left-Sock Club")
+    # ... (Your working puddle and storybook code goes here) ...
+
+# --- THE MAIN ROOM SHELF ---
+# Put your Dented Peach Bible download button right here, ABOVE the chat!
+st.markdown("### The Archive")
+with open("Dented_Peach_Bible.pdf", "rb") as peach_file:  # (Make sure the name matches!)
+    st.download_button(
+        label="📖 Download the Dented Peach Bible",
+        data=peach_file,
+        file_name="Dented_Peach_Bible.pdf",
+        mime="application/pdf"
+    )
+st.markdown("---") # A dividing line to separate the shelf from the chat
+
+# ==========================================
+# ZONE 2: THE CONVEYOR BELT (The Chat History)
+# ==========================================
+# This is where Streamlit prints the old messages. 
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# ==========================================
+# ZONE 3: THE CHAT INPUT (The bottom of the file)
+# ==========================================
+if prompt := st.chat_input("Enter the Sub-Basement..."):
+    # ... (Your chat logic goes down here) ...
 # --- 1. Web Page Setup ---
 st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
