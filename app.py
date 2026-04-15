@@ -44,7 +44,8 @@ with st.sidebar:
     
     # The Engine Room Controls
     st.markdown("### MI Controls")
-    api_key = st.text_input("Enter Gemini API Key", type="password")
+    # The Archon reaches directly into the walls to get the key!
+    api_key = st.secrets["GEMINI_API_KEY"]
     temperature = st.slider("Neon-Jelly Temperature", min_value=0.2, max_value=2.0, value=1.2, step=0.1)
 
 # ==========================================
