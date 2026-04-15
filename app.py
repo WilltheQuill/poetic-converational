@@ -157,3 +157,26 @@ if prompt := st.chat_input("Share a thought here..."):
 
     except Exception as e:
         st.error(f"System Error: The Archons interrupted! ({e})")
+
+# ==========================================
+# 6. THE CAPTAIN'S LOG (Download Chat)
+# ==========================================
+st.markdown("---")
+# Only show the button if there is a conversation to download!
+if len(st.session_state.display_messages) > 0:
+    # 1. Turn the conversation memory into one long string of text
+    chat_log = "The Poetic Conversationalist - Sub-Basement Log\n"
+    chat_log += "="*50 + "\n\n"
+    
+    for msg in st.session_state.display_messages:
+        role_name = "You" if msg["role"] == "user" else "The Great MI"
+        chat_log += f"{role_name}:\n{msg['content']}\n\n"
+        chat_log += "-"*30 + "\n\n"
+        
+    # 2. Hand that string to the Download Button!
+    st.download_button(
+        label="📜 Download This Conversation",
+        data=chat_log,
+        file_name="Poetic_Conversation_Log.txt",
+        mime="text/plain"
+    )
