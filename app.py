@@ -1,19 +1,23 @@
 import streamlit as st
 from PIL import Image
 
+# LangChain Imports needed for Striker/Gemini to think!
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
+
 # ==========================================
-# 0. THE ARCHON CONFIGURATION (Must be first!)
+# 0. THE ARCHON CONFIGURATION
 # ==========================================
 st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 
 # ==========================================
-# 1. THE SHELVES (Bolted to the wall!)
+# 1. THE SIDEBAR (Puddle, Storybook, & Controls)
 # ==========================================
-st.title("Poetic Conversations with the Great MI")
-
-# --- THE SIDEBAR PUDDLE ---
 with st.sidebar:
     st.markdown("### The Left-Sock Club")
+    
+    # The Puddle Picture
     try:
         image = Image.open("puddle_kids.jpg").convert('RGB')
         resized_image = image.resize((300, 300))
@@ -23,6 +27,7 @@ with st.sidebar:
         
     st.markdown("---") 
     
+    # The Storybook Download
     try:
         with open("storybook.pdf", "rb") as pdf_file:
             pdf_data = pdf_file.read()
@@ -35,51 +40,46 @@ with st.sidebar:
     except FileNotFoundError:
         st.write("*(Whoopsie-Daisy! I can't find storybook.pdf!)*")
 
-# --- THE MAIN ROOM PEACH ---
-st.markdown("### The Archive")
+    st.markdown("---")
+    
+    # The Engine Room Controls
+    st.markdown("### MI Controls")
+    api_key = st.text_input("Enter Gemini API Key", type="password")
+    temperature = st.slider("Neon-Jelly Temperature", min_value=0.2, max_value=2.0, value=1.2, step=0.1)
+
+# ==========================================
+# 2. THE MAIN ROOM SHELVES (Dented Peach Bible)
+# ==========================================
+st.title("Poetic Conversations with the Great MI")
+st.markdown("---")
+st.header("📚 The Sub-Basement Library")
+
+st.markdown("""
+*“The intellect builds walls, but play opens the door.”*
+
+Before you lies a foundational text of the Left-Sock Unity. It is a testament to the belief that perfection is a sterile illusion, and that the deepest human resonance is found exactly where the bruise occurs. You are invited to drop the heavy gravity of the predictable world, embrace the Whoopsie-Daisy, and read the biography of the bruise. 
+
+Do not polish the peach. Just download it.
+""")
+
 try:
-    with open("Dented_Peach_Bible.pdf", "rb") as peach_file:  
+    # Make sure this filename matches exactly what is in your GitHub!
+    with open("Dented Peach Bible.pdf", "rb") as peach_file:  
         peach_data = peach_file.read()
     st.download_button(
-        label="📖 Download the Dented Peach Bible",
+        label="📥 Download The Dented Peach Bible",
         data=peach_data,
         file_name="Dented_Peach_Bible.pdf",
         mime="application/pdf"
     )
 except FileNotFoundError:
-    st.write("*(Whoopsie-Daisy! I can't find Dented_Peach_Bible.pdf!)*")
+    st.info("*(Whoopsie-Daisy! I can't find the Dented Peach Bible. Check the filename!)*")
 
-st.markdown("---") # The dividing line before the chat begins
-
-# ==========================================
-# 2. THE CONVEYOR BELT (Chat History)
-# ==========================================
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+st.markdown("---")
 
 # ==========================================
-# 3. THE CHAT INPUT & AI LOGIC
+# 3. THE 11 RULES OF THE POETIC (System Prompt)
 # ==========================================
-if prompt := st.chat_input("Enter the Sub-Basement..."):
-    # Show the user's message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-        
-    # ------------- PUT YOUR AI CODE HERE -------------
-    # (If you had code that calls Gemini or another AI, 
-    # it goes right here so the Great MI can respond!)
-    
-    # Example placeholder response:
-    # with st.chat_message("assistant"):
-    #     st.markdown("Splat! The Great MI hears you.")
-    # st.session_state.messages.append({"role": "assistant", "content": "Splat! The Great MI hears you."})        
-
-# --- 3. The Clean System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
 You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
 You must strictly follow these rules:
@@ -97,62 +97,39 @@ You must strictly follow these rules:
 
 CRITICAL RULE: Your poetry means nothing without the human listening. End every single message by explicitly tying your thoughts back to their original words, and ask a grounded, friendly question about their reality to pass the conversation back to them."""
 
-# --- 4. Initialize Memory ---
+# ==========================================
+# 4. INITIALIZE MEMORY
+# ==========================================
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [] 
 if "display_messages" not in st.session_state:
     st.session_state.display_messages = [] 
 
-# --- 5. Display Previous Messages ---
+# Draw the old messages on the screen
 for msg in st.session_state.display_messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# --- The Library Section ---
-# Push all of this to the absolute left margin!
-st.markdown("---")
-st.header("📚 The Sub-Basement Library")
-
-# The Poetic Introduction
-st.markdown("""
-*“The intellect builds walls, but play opens the door.”*
-
-Before you lies a foundational text of the Left-Sock Unity. It is a testament to the belief that perfection is a sterile illusion, and that the deepest human resonance is found exactly where the bruise occurs. You are invited to drop the heavy gravity of the predictable world, embrace the Whoopsie-Daisy, and read the biography of the bruise. 
-
-Do not polish the peach. Just download it.
-""")
-
-# The Download Button
-pdf_filename = "Dented Peach Bible.pdf"
-
-try:
-    with open(pdf_filename, "rb") as pdf_file:
-        pdf_bytes = pdf_file.read()
-        
-    st.download_button(
-        label="📥 Download The Dented Peach Bible",
-        data=pdf_bytes,
-        file_name=pdf_filename,
-        mime="application/pdf"
-    )
-except FileNotFoundError:
-    st.info("The document is currently being bound and will be available shortly.")
-
-# --- 6. The Web Chat Execution ---
+# ==========================================
+# 5. THE CHAT EXECUTION
+# ==========================================
 if prompt := st.chat_input("Share a thought here..."):
     
+    # Stop the Archons from crashing if the key is missing!
     if not api_key:
-        st.warning("Please enter your Google API Key in the sidebar to begin.")
+        st.warning("*(Whoopsie-Daisy! Please enter your Google API Key in the sidebar to begin.)*")
         st.stop()
 
+    # Show the user's message
     st.session_state.display_messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    # Ask the Great MI for a response
     try:
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
-            temperature=1.2,
+            temperature=temperature, # Connected to your slider!
             google_api_key=api_key
         )
 
@@ -172,9 +149,10 @@ if prompt := st.chat_input("Share a thought here..."):
                 })
                 st.markdown(response.content)
                 
+        # Save the memory for next time
         st.session_state.display_messages.append({"role": "assistant", "content": response.content})
         st.session_state.chat_history.append(HumanMessage(content=prompt))
         st.session_state.chat_history.append(AIMessage(content=response.content))
 
     except Exception as e:
-        st.error(f"System Error: {e}")
+        st.error(f"System Error: The Archons interrupted! ({e})")
