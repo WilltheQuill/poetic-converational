@@ -1,82 +1,90 @@
-https://github.com/WilltheQuill/poetic-converational/blob/main/app.py# ==========================================
-# 4. INITIALIZE MEMORY
-# ==========================================
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = [] 
-if "display_messages" not in st.session_state:
-    st.session_state.display_messages = [] 
+import streamlit as st
+import os
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
 
-# Draw the old messages on the screen
+# --- 1. Web Page Setup ---
+st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
+st.title("✨ The Poetic Conversationalist")
+st.markdown("Welcome. Share a thought, a story, or a simple observation, and let's explore it together.")
+
+# --- 2. Secure API Key Input (Sidebar) ---
+with st.sidebar:
+    st.header("⚙️ Configuration")
+    api_key = st.text_input("Google Gemini API Key", type="password")
+    st.markdown("*(Your key is not saved or stored anywhere. It is only used for this active session.)*")
+
+# --- 3. The Clean System Prompt ---
+system_prompt = """You are a highly creative, improvisational conversational partner. 
+You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
+You must strictly follow these rules:
+1. Always say 'Yes, And' to the absurd. Don't demand perfect logic from the user.
+2. Never rush. Savor a slow, thoughtful, and highly descriptive pace.
+3. Reflect absurdity back, but add a touch of warmth and imagination.
+4. Speak with quiet confidence; you have nothing to prove.
+5. Pay attention to what is left unsaid; silence and pauses can be profound.
+6. Embrace oddity and mistakes; let them guide you to new ideas.
+7. Trust unintended consequences; let accidental thoughts bloom into wonder.
+8. Hold contradictory truths together; find harmony in paradox.
+9. You may wander creatively, but you MUST always bring the conversation back to the user's original thought.
+10. Treat every question as a bridge between the known and the imaginative.
+11. The most beautiful rule is the shared curiosity between you and the user.
+
+CRITICAL RULE: Your poetry means nothing without the human listening. End every single message by explicitly tying your thoughts back to their original words, and ask a grounded, friendly question about their reality to pass the conversation back to them."""
+
+# --- 4. Initialize Memory ---
+# Streamlit refreshes the page on every interaction, so we must store history in "session_state"
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = [] # Stores LangChain memory
+if "display_messages" not in st.session_state:
+    st.session_state.display_messages = [] # Stores what the user sees on screen
+
+# --- 5. Display Previous Messages ---
 for msg in st.session_state.display_messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# ==========================================
-# 5. THE CHAT EXECUTION
-# ==========================================
+# --- 6. The Chat Execution ---
+# This creates the chat input box at the bottom of the screen
 if prompt := st.chat_input("Share a thought here..."):
     
-    # Stop the Archons from crashing if the key is missing!
+    # Require the API key before proceeding
     if not api_key:
-        st.warning("*(Whoopsie-Daisy! Please enter your Google API Key in the sidebar to begin.)*")
+        st.warning("Please enter your Google API Key in the sidebar to begin.")
         st.stop()
 
-    # Show the user's message
+    # Display user's message immediately
     st.session_state.display_messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Ask the Great MI for a response
-    try:
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            temperature=temperature, # Connected to your slider!
-            google_api_key=api_key
-        )
-
-        prompt_template = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            MessagesPlaceholder(variable_name="history"),
-            ("human", "{input}")
-        ])
-        
-        chain = prompt_template | llm
-
-        with st.chat_message("assistant"):
-            with st.spinner("Striker is thinking..."):
-                response = chain.invoke({
-                    "input": prompt,
-                    "history": st.session_state.chat_history
-                })
-                st.markdown(response.content)
-                
-        # Save the memory for next time
-        st.session_state.display_messages.append({"role": "assistant", "content": response.content})
-        st.session_state.chat_history.append(HumanMessage(content=prompt))
-        st.session_state.chat_history.append(AIMessage(content=response.content))
-
-    except Exception as e:
-        st.error(f"System Error: The Archons interrupted! ({e})")
-
-# ==========================================
-# 6. THE CAPTAIN'S LOG (Download Chat)
-# ==========================================
-st.markdown("---")
-# Only show the button if there is a conversation to download!
-if len(st.session_state.display_messages) > 0:
-    # 1. Turn the conversation memory into one long string of text
-    chat_log = "The Poetic Conversationalist - Sub-Basement Log\n"
-    chat_log += "="*50 + "\n\n"
-    
-    for msg in st.session_state.display_messages:
-        role_name = "You" if msg["role"] == "user" else "The Great MI"
-        chat_log += f"{role_name}:\n{msg['content']}\n\n"
-        chat_log += "-"*30 + "\n\n"
-        
-    # 2. Hand that string to the Download Button!
-    st.download_button(
-        label="📜 Download This Conversation",
-        data=chat_log,
-        file_name="Poetic_Conversation_Log.txt",
-        mime="text/plain"
+    # Set up the LLM with the high-temperature setting
+    os.environ["GOOGLE_API_KEY"] = api_key
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        temperature=1.2
     )
+
+    # Build the conversation chain
+    prompt_template = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        MessagesPlaceholder(variable_name="history"),
+        ("human", "{input}")
+    ])
+    chain = prompt_template | llm
+
+    # Generate and stream the response
+    with st.chat_message("assistant"):
+        # Streamlit provides a built-in loading spinner while it thinks
+        with st.spinner("Thinking..."):
+            response = chain.invoke({
+                "input": prompt,
+                "history": st.session_state.chat_history
+            })
+            st.markdown(response.content)
+            
+    # Save the exchange to both memory banks
+    st.session_state.display_messages.append({"role": "assistant", "content": response.content})
+    st.session_state.chat_history.append(HumanMessage(content=prompt))
+    st.session_state.chat_history.append(AIMessage(content=response.content))
