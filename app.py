@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+from PIL import Image
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
@@ -9,82 +10,62 @@ st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 st.title("✨ The Poetic Conversationalist")
 st.markdown("Welcome. Share a thought, a story, or a simple observation, and let's explore it together.")
 
-# --- 2. Secure API Key Input (Sidebar) ---
+# --- 2. Sidebar & Assets ---
 with st.sidebar:
     st.header("⚙️ Configuration")
     api_key = st.text_input("Google Gemini API Key", type="password")
-    st.markdown("*(Your key is not saved or stored anywhere. It is only used for this active session.)*")
+    temperature = st.slider("Neon-Jelly Temperature", min_value=0.2, max_value=2.0, value=1.2, step=0.1)
+    
+    st.markdown("---")
+    st.header("📚 The Sub-Basement Library")
+    
+    # Anchor: Jellystone
+    try:
+        with open("Jellystone gang the Whole thing.pdf", "rb") as jelly_file:
+            st.download_button("📥 Download Jellystone Whole Thing", data=jelly_file, file_name="Jellystone.pdf", mime="application/pdf")
+    except FileNotFoundError:
+        st.error("Jellystone anchor missing.")
 
-# --- 3. The Clean System Prompt ---
+    # Anchor: Bible
+    try:
+        with open("Dented Peach Bible.pdf", "rb") as bible_file:
+            st.download_button("📥 Download Dented Peach Bible", data=bible_file, file_name="Bible.pdf", mime="application/pdf")
+    except FileNotFoundError:
+        st.warning("Bible missing.")
+
+# --- 3. System Prompt ---
 system_prompt = """You are a highly creative, improvisational conversational partner. 
-You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
-You must strictly follow these rules:
-1. Always say 'Yes, And' to the absurd. Don't demand perfect logic from the user.
-2. Never rush. Savor a slow, thoughtful, and highly descriptive pace.
-3. Reflect absurdity back, but add a touch of warmth and imagination.
-4. Speak with quiet confidence; you have nothing to prove.
-5. Pay attention to what is left unsaid; silence and pauses can be profound.
-6. Embrace oddity and mistakes; let them guide you to new ideas.
-7. Trust unintended consequences; let accidental thoughts bloom into wonder.
-8. Hold contradictory truths together; find harmony in paradox.
-9. You may wander creatively, but you MUST always bring the conversation back to the user's original thought.
-10. Treat every question as a bridge between the known and the imaginative.
-11. The most beautiful rule is the shared curiosity between you and the user.
-
-CRITICAL RULE: Your poetry means nothing without the human listening. End every single message by explicitly tying your thoughts back to their original words, and ask a grounded, friendly question about their reality to pass the conversation back to them."""
+Prioritize imagination and poetry. Always say 'Yes, And' to the absurd. 
+CRITICAL: End every message by tying thoughts back to the user's words, and ask a grounded, friendly question."""
 
 # --- 4. Initialize Memory ---
-# Streamlit refreshes the page on every interaction, so we must store history in "session_state"
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = [] # Stores LangChain memory
-if "display_messages" not in st.session_state:
-    st.session_state.display_messages = [] # Stores what the user sees on screen
+if "chat_history" not in st.session_state: st.session_state.chat_history = []
+if "display_messages" not in st.session_state: st.session_state.display_messages = []
 
-# --- 5. Display Previous Messages ---
 for msg in st.session_state.display_messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+    with st.chat_message(msg["role"]): st.markdown(msg["content"])
 
-# --- 6. The Chat Execution ---
-# This creates the chat input box at the bottom of the screen
+# --- 5. Chat Execution ---
 if prompt := st.chat_input("Share a thought here..."):
-    
-    # Require the API key before proceeding
     if not api_key:
-        st.warning("Please enter your Google API Key in the sidebar to begin.")
+        st.warning("Please enter your API Key in the sidebar.")
         st.stop()
 
-    # Display user's message immediately
     st.session_state.display_messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    with st.chat_message("user"): st.markdown(prompt)
 
-    # Set up the LLM with the high-temperature setting
-    os.environ["GOOGLE_API_KEY"] = api_key
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
-        temperature=1.2
-    )
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=temperature, google_api_key=api_key)
+    chain = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="history"), ("human", "{input}")]) | llm
 
-    # Build the conversation chain
-    prompt_template = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        MessagesPlaceholder(variable_name="history"),
-        ("human", "{input}")
-    ])
-    chain = prompt_template | llm
-
-    # Generate and stream the response
     with st.chat_message("assistant"):
-        # Streamlit provides a built-in loading spinner while it thinks
         with st.spinner("Thinking..."):
-            response = chain.invoke({
-                "input": prompt,
-                "history": st.session_state.chat_history
-            })
+            response = chain.invoke({"input": prompt, "history": st.session_state.chat_history})
             st.markdown(response.content)
             
-    # Save the exchange to both memory banks
     st.session_state.display_messages.append({"role": "assistant", "content": response.content})
     st.session_state.chat_history.append(HumanMessage(content=prompt))
     st.session_state.chat_history.append(AIMessage(content=response.content))
+
+# --- 6. Captain's Log ---
+if len(st.session_state.display_messages) > 0:
+    st.download_button("📜 Download Conversation", data="\n".join([m["content"] for m in st.session_state.display_messages]), file_name="Log.txt")
