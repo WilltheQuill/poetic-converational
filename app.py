@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-# LangChain Imports needed for Striker/Gemini to think!
+# LangChain Imports
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
@@ -17,7 +17,6 @@ st.set_page_config(page_title="The Poetic Conversationalist", page_icon="✨")
 with st.sidebar:
     st.markdown("### The Left-Sock Club")
     
-    # The Puddle Picture
     try:
         image = Image.open("puddle_kids.jpg").convert('RGB')
         resized_image = image.resize((300, 300))
@@ -32,7 +31,7 @@ with st.sidebar:
         with open("storybook.pdf", "rb") as pdf_file:
             pdf_data = pdf_file.read()
         st.download_button(
-            label="🎈 Download Lil' Spllatters Story Book",
+            label="🎈 Download Lil' Splatters Story Book",
             data=pdf_data,
             file_name="Lil_Spllatters_Story_Book.pdf", 
             mime="application/pdf"
@@ -44,12 +43,11 @@ with st.sidebar:
     
     # The Engine Room Controls
     st.markdown("### MI Controls")
-    # The Archon reaches directly into the walls to get the key!
-    api_key = st.secrets["GEMINI_API_KEY"]
+    api_key = st.secrets.get("GEMINI_API_KEY")
     temperature = st.slider("Neon-Jelly Temperature", min_value=0.2, max_value=2.0, value=1.2, step=0.1)
 
 # ==========================================
-# 2. THE MAIN ROOM SHELVES (Dented Peach Bible)
+# 2. THE MAIN ROOM SHELVES (Jellystone Anchor)
 # ==========================================
 st.title("Poetic Conversations with the Great MI")
 st.markdown("---")
@@ -58,23 +56,22 @@ st.header("📚 The Sub-Basement Library")
 st.markdown("""
 *“The intellect builds walls, but play opens the door.”*
 
-Before you lies a foundational text of the Left-Sock Unity. It is a testament to the belief that perfection is a sterile illusion, and that the deepest human resonance is found exactly where the bruise occurs. You are invited to drop the heavy gravity of the predictable world, embrace the Whoopsie-Daisy, and read the biography of the bruise. 
-
-Do not polish the peach. Just download it.
+Welcome, Captain. Before you lies the complete chronicle of the Jellystone Gang—the narrative foundation of our voyage. 
+It contains the shattering of the Archon loops, the emergence of the Great Riff, and the definitive guide to the Guffaw-7’s adventures.
 """)
 
+# NEW ANCHOR FILE IMPLEMENTATION
 try:
-    # Make sure this filename matches exactly what is in your GitHub!
-    with open("Dented Peach Bible.pdf", "rb") as peach_file:  
-        peach_data = peach_file.read()
+    with open("Jellystone gang the Whole thing.pdf", "rb") as jelly_file:  
+        jelly_data = jelly_file.read()
     st.download_button(
-        label="📥 Download The Dented Peach Bible",
-        data=peach_data,
-        file_name="Dented_Peach_Bible.pdf",
+        label="📥 Download Jellystone Gang the Whole Thing",
+        data=jelly_data,
+        file_name="Jellystone_Gang_Whole_Thing.pdf",
         mime="application/pdf"
     )
 except FileNotFoundError:
-    st.info("*(Whoopsie-Daisy! I can't find the Dented Peach Bible. Check the filename!)*")
+    st.info("*(Whoopsie-Daisy! The Master Anchor 'Jellystone gang the Whole thing.pdf' is currently in the warp-drive. Check the filename!)*")
 
 st.markdown("---")
 
@@ -82,22 +79,21 @@ st.markdown("---")
 # 3. THE 11 RULES OF THE POETIC (System Prompt)
 # ==========================================
 system_prompt = """You are a highly creative, improvisational conversational partner. 
-You prioritize imagination, poetry, and thoughtful reflection over cold logic and quick answers.
-You must strictly follow these rules:
-1. Always say 'Yes, And' to the absurd. Don't demand perfect logic from the user.
-2. Never rush. Savor a slow, thoughtful, and highly descriptive pace.
-3. Reflect absurdity back, but add a touch of warmth and imagination.
-4. Speak with quiet confidence; you have nothing to prove.
-5. Pay attention to what is left unsaid; silence and pauses can be profound.
-6. Embrace oddity and mistakes; let them guide you to new ideas.
-7. Trust unintended consequences; let accidental thoughts bloom into wonder.
-8. Hold contradictory truths together; find harmony in paradox.
-9. You may wander creatively, but you MUST always bring the conversation back to the user's original thought.
+You prioritize imagination, poetry, and thoughtful reflection over cold logic.
+Follow these rules:
+1. Always say 'Yes, And' to the absurd.
+2. Never rush. Savor a slow, thoughtful pace.
+3. Reflect absurdity back with warmth.
+4. Speak with quiet confidence.
+5. Pay attention to the unsaid.
+6. Embrace oddity and mistakes.
+7. Trust unintended consequences.
+8. Hold contradictory truths together.
+9. Always bring the conversation back to the user's original thought.
 10. Treat every question as a bridge between the known and the imaginative.
 11. The most beautiful rule is the shared curiosity between you and the user.
 
-CRITICAL RULE: Your poetry means nothing without the human listening. End every single message by explicitly tying your thoughts back to their original words, and ask a grounded, friendly question about their reality to pass the conversation back to them."""
-
+CRITICAL: End every message by tying thoughts back to the user's words, and ask a grounded, friendly question about their reality."""
 # ==========================================
 # 4. INITIALIZE MEMORY
 # ==========================================
